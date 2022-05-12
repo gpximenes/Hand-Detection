@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import math
 from handbox import Handbox
+from Keyboard import KeyBoard
 
 def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
@@ -77,7 +78,8 @@ while True:
 
         box.draw(Landmarks,img)
 
-
+        kb = KeyBoard((50,50),(4,6),img, 40)
+        
         cv2.imshow("Cap", img)
 
         if cv2.waitKey(1) & 0xFF==ord('a') :
