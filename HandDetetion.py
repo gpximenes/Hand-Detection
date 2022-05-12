@@ -1,10 +1,7 @@
 import cv2
-from cv2 import CAP_PROP_FRAME_WIDTH
-from cv2 import CAP_PROP_FRAME_HEIGHT 
 import mediapipe as mp
-import time
 import math
-
+from handbox import Handbox
 
 def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
@@ -37,48 +34,60 @@ hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
 
 
-
+box = Handbox()
 
 
 COLOR = (255, 51, 51)
 
 while True:
     sucess, img = cap.read()
-    img = cv2.flip(img,1)
-    h, w, _ = img.shape
-    #print('Height: ',h ,' Width: ', w)
+    if sucess:
+        img = cv2.flip(img,1)
+        h, w, _ = img.shape
+        #print('Height: ',h ,' Width: ', w)
+        
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        results = hands.process(imgRGB)
+
+
+        Landmarks = []
+        X_list = []
+        Y_list = []
+
+        # Draw Hand Landmarks
+        if(results.multi_hand_landmarks):
+            for handLms in results.multi_hand_landmarks:
+                mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
+                
+
+
+            for id, landmark in enumerate(handLms.landmark):
+                px, py = int(landmark.x * w), int(landmark.y * h)
+                Landmarks.append((id,px,py))
+                X_list.append((id,px))
+                Y_list.append((id,py))
+
+
+            if detect_click(Landmarks):
+                print("Click")
+
+
+       
     
-    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = hands.process(imgRGB)
+
+        box.draw(Landmarks,img)
 
 
-    Landmarks = []
-    X_list = []
-    Y_list = []
+        cv2.imshow("Cap", img)
 
-    
-    if(results.multi_hand_landmarks):
-        for handLms in results.multi_hand_landmarks:
-            mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
-            
+        if cv2.waitKey(1) & 0xFF==ord('a') :
+            print(box.get_area())
 
 
-        for id, landmark in enumerate(handLms.landmark):
-            px, py = int(landmark.x * w), int(landmark.y * h)
-            Landmarks.append((id,px,py))
-            X_list.append((id,px))
-            Y_list.append((id,py))
+        if cv2.waitKey(1) & 0xFF==ord('s') :
+            break
 
-        if detect_click(Landmarks) == True:
-            print("Click")
-
-
-    cv2.rectangle(img, (20,20),(60,60), COLOR, cv2.FILLED)
-
-
-    cv2.imshow("Cap", img)
-
-
-
-    if cv2.waitKey(1) & 0xFF==ord('s') :
-        break
+    else:
+        print("Can't get video frame, retrying...")
+        cap.release()
+        cv2.destroyAllWindows()

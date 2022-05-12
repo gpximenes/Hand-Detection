@@ -1,0 +1,17 @@
+key_texts = ['Q','W','E','R','T','Y','U','I','O','P',
+        'A','S','D','F','G','H','J','K','L',
+            'Z','X','C','V','B','N','M']
+
+key_pos = []
+
+ini_xpos = 50
+ini_ypos = 50
+key_pos = [(ini_xpos,ini_ypos)]
+space = 30
+for i in range(len(key_texts) - 1 ):
+    key_pos.append((key_pos[i][0] + space , key_pos[i][1]))
+
+keys = []
+for text in key_texts:
+    keys.append(Key(text,))
+
