@@ -1,3 +1,4 @@
+from turtle import update, width
 import cv2
 import mediapipe as mp
 import math
@@ -8,22 +9,40 @@ def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
     return distance
 
-def detect_click(Landmarks, Threshold = 20):
-    index_finger_ID = 7
-    middle_finger_ID = 11 
+def detect_click(Landmarks, Threshold = 25, mode = 0):
 
-    index_X = Landmarks[index_finger_ID][1] 
-    index_Y = Landmarks[index_finger_ID][2] 
-    middle_X = Landmarks[middle_finger_ID][1] 
-    middle_Y = Landmarks[middle_finger_ID][2] 
-    distance = get_distance(index_X,index_Y,middle_X,middle_Y)
-    if distance < Threshold:
-        return True
-    else:
-        return False
+    if Landmarks:
+        if mode == 1: # Using Index fingertip and middle fingertip
+            static_finger_ID = 8
+            aux_finger_ID = 12 
+        
+        if mode == 0: # Using thumb fingertip and base of index finger
+            static_finger_ID = 5
+            aux_finger_ID = 4 
+
+        index_X = Landmarks[static_finger_ID][1] 
+        index_Y = Landmarks[static_finger_ID][2] 
+        middle_X = Landmarks[aux_finger_ID][1] 
+        middle_Y = Landmarks[aux_finger_ID][2] 
+        distance = get_distance(index_X,index_Y,middle_X,middle_Y)
+        if distance < Threshold:
+            return True
+        else:
+            return False
     
 
+def click_key(click_pos):
+    x_click, y_click = click_pos
 
+
+    if Landmarks:
+        for key in kb.keys:
+            x,y = key.x,key.y
+            width,height = key.width,key.height
+
+            if x < x_click < x + width:
+                if y < y_click < y + height:
+                    key.is_pressed = True
 
 
 cap = cv2.VideoCapture(0)
@@ -45,7 +64,6 @@ while True:
     if sucess:
         img = cv2.flip(img,1)
         h, w, _ = img.shape
-        #print('Height: ',h ,' Width: ', w)
         
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = hands.process(imgRGB)
@@ -58,8 +76,8 @@ while True:
         # Draw Hand Landmarks
         if(results.multi_hand_landmarks):
             for handLms in results.multi_hand_landmarks:
-                mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
-                
+                # mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
+                pass
 
 
             for id, landmark in enumerate(handLms.landmark):
@@ -69,16 +87,23 @@ while True:
                 Y_list.append((id,py))
 
 
-            if detect_click(Landmarks):
-                print("Click")
-
-
-       
-    
 
         box.draw(Landmarks,img)
 
-        kb = KeyBoard((50,50),(4,6),img, 40)
+        kb = KeyBoard((50,50),img, 40)
+
+
+
+        if detect_click(Landmarks):
+            click_pos = (Landmarks[8][1],Landmarks[8][2])
+            print("Click on pos:", click_pos)
+            click_key(click_pos)
+
+
+        
+        kb.update_colors()
+
+
         
         cv2.imshow("Cap", img)
 
@@ -87,7 +112,10 @@ while True:
 
 
         if cv2.waitKey(1) & 0xFF==ord('s') :
+            cap.release()
+            cv2.destroyAllWindows()
             break
+            
 
     else:
         print("Can't get video frame, retrying...")

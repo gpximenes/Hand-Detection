@@ -1,13 +1,12 @@
-from turtle import update
 from Key import Key
 
 class KeyBoard():
-    def __init__(self, ini_pos, matrix ,img,keysize,space=20,  ) -> None:
+    def __init__(self, ini_pos ,img,keysize,space=20 ) -> None:
         self.key_texts = ['Q','W','E','R','T','Y','U','I','O','P',
                 'A','S','D','F','G','H','J','K','L',
-                    'Z','X','C','V','B','N','M']
+                    'Z','X','C','V','B','N','M', "BS"]
 
-        self.rows,self.columns = matrix
+        self.rows,self.columns = (4,7)
 
         self.key_pos = []
 
@@ -28,13 +27,15 @@ class KeyBoard():
         self.update_keys_pos(positions)
         self.draw_keys(self.key_pos)
 
+
+
     def generate_keys_pos(self,ini_pos):
         positions = []
-        ini_xpos,ini_ypos = ini_pos
+        xpos,ypos = ini_pos
         for i in range(self.rows):
             for j in range(self.columns):    
-                positions.append((ini_xpos + self.space * j, ini_ypos))
-            ini_ypos = ini_ypos + self.space
+                positions.append((xpos + self.space * j, ypos))
+            ypos = ypos + self.space
         return positions
 
 
@@ -45,6 +46,8 @@ class KeyBoard():
     
     def draw_keys(self,key_pos):
         for i,pos in (enumerate(key_pos)):
+            if i >= len(self.key_texts):
+                break
             x,y = pos
             self.keys.append(Key(self.key_texts[i],x,y))
         
@@ -52,5 +55,6 @@ class KeyBoard():
             key.draw_key(self.img) 
 
 
-
-
+    def update_colors(self):
+        for key in self.keys:
+            key.draw_key(self.img) 
