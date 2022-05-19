@@ -3,8 +3,9 @@ import mediapipe as mp
 
 
 class Key():
-    def __init__(self,text,x,y,width = 40, height = 40):
-        self.color = (255, 51, 51) # blue
+    def __init__(self,text,x,y,width = 50, height = 50):
+        
+
         self.width = width
         self.height = height
         
@@ -16,6 +17,7 @@ class Key():
         self.font_size = 1.4
 
         self.is_pressed = False
+        self.color = (255, 51, 51) # blue
         self.pressed_color = (0,255,0) # green
 
     def draw_key(self,img):
@@ -28,4 +30,8 @@ class Key():
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, (255,255,255), 2)
           
 
+class BackSpace(Key):
+    def __init__(self, x, y, width=50, height=50):
+        super().__init__( x, y, width, height)
+        self.text = "*"
 

@@ -2,21 +2,31 @@ import cv2
 import mediapipe as mp
 import math
 from Handbox import Handbox
+from Key import Key
 from Keyboard import KeyBoard
+from TextBar import TextBar
 
 def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
     return distance
 
-def detect_click(Landmarks, Threshold = 25, mode = 0):
+def detect_click(Landmarks, Threshold = 25, mode = 1):
 
     if Landmarks:
-        if mode == 1: # Using Index fingertip and middle fingertip
+        if mode == 0: # Using Index fingertip and middle fingertip
             static_finger_ID = 8
             aux_finger_ID = 12 
         
-        if mode == 0: # Using thumb fingertip and base of index finger
-            static_finger_ID = 5
+        if mode == 1: # Using thumb fingertip and base of index finger
+            static_finger_ID = 6
+            aux_finger_ID = 4 
+
+        if mode == 2:
+            static_finger_ID = 12 # Using middle fingertip and thumb
+            aux_finger_ID = 4 
+
+        if mode == 3:
+            static_finger_ID = 8 # Using middle fingertip and thumb
             aux_finger_ID = 4 
 
         index_X = Landmarks[static_finger_ID][1] 
@@ -30,8 +40,6 @@ def detect_click(Landmarks, Threshold = 25, mode = 0):
             return False
     
 
-
-
 class Main():
     
     def click_key(self,click_pos):
@@ -44,55 +52,59 @@ class Main():
                 if x < x_click < x + width:
                     if y < y_click < y + height:
                         key.is_pressed = True
-                        self.TextBar.append(key.text)
-                        print(*self.TextBar)
+                        self.textbar.add_letter(key.text)
+                        
 
 
     def __init__(self) -> None:
-        cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(0)
 
 
-        mpHands = mp.solutions.hands
-        hands = mpHands.Hands()
-        mpDraw = mp.solutions.drawing_utils
+        self.mpHands = mp.solutions.hands
+        self.hands = self.mpHands.Hands()
+        self.mpDraw = mp.solutions.drawing_utils
 
-        box = Handbox()
+        # self.box = Handbox()
 
-        self.TextBar = []
+        self.textbar = TextBar()
 
+        self.main()
+
+
+    def main(self):
 
         while True:
-            sucess, img = cap.read()
+            sucess, img = self.cap.read()
             if sucess:
                 img = cv2.flip(img,1)
                 h, w, _ = img.shape
                 
                 imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = hands.process(imgRGB)
+                results = self.hands.process(imgRGB)
 
 
                 self.Landmarks = []
-                X_list = []
-                Y_list = []
+
+
 
                 # Draw Hand Landmarks
                 if(results.multi_hand_landmarks):
                     for handLms in results.multi_hand_landmarks:
-                        mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
+                        self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
+                        pass
                     
 
 
                     for id, landmark in enumerate(handLms.landmark):
                         px, py = int(landmark.x * w), int(landmark.y * h)
                         self.Landmarks.append((id,px,py))
-                        X_list.append((id,px))
-                        Y_list.append((id,py))
 
 
 
-                box.draw(self.Landmarks,img)
 
-                self.kb = KeyBoard((50,50),img, 40)
+                # self.box.draw(self.Landmarks,img)
+
+                self.kb = KeyBoard((50,50),img,40)
 
 
 
@@ -100,6 +112,7 @@ class Main():
                     click_pos = (self.Landmarks[8][1],self.Landmarks[8][2])
                     # print("Click on pos:", click_pos)
                     self.click_key(click_pos)
+                    
 
 
                 
@@ -109,16 +122,26 @@ class Main():
                 
                 cv2.imshow("Cap", img)
 
+                if cv2.waitKey(5) & 0xFF==ord('t') :
+                    print(*self.textbar.text, sep="")
 
-                if cv2.waitKey(1) & 0xFF==ord('s') :
-                    cap.release()
+
+                if cv2.waitKey(5) & 0xFF==ord('s') :
+                    self.cap.release()
                     cv2.destroyAllWindows()
                     break
+                
+
+
+                    
+
+
+
                     
 
             else:
                 print("Can't get video frame, retrying...")
-                cap.release()
+                self.cap.release()
                 cv2.destroyAllWindows()
 
 
