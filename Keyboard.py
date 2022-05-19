@@ -63,9 +63,9 @@ class KeyBoard():
             self.keys.append(Key(self.key_texts[i],x,y))
 
         ini_xpos, ini_ypos = key_pos[0]
-        backspace_pos = (ini_xpos + self.space * (self.columns + 1) ,ini_ypos)
 
-        self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1],50,50))
+        backspace_pos = (ini_xpos + self.space * (self.columns + 1) ,ini_ypos)
+        self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1]))
         
         for key in self.keys:
             key.draw_key(self.img) 

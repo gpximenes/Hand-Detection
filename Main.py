@@ -52,7 +52,13 @@ class Main():
                 if x < x_click < x + width:
                     if y < y_click < y + height:
                         key.is_pressed = True
-                        self.textbar.add_letter(key.text)
+                        if key.type == 'text':
+                            self.textbar.add_letter(key.text)
+                        
+                        if key.type == 'backspace':
+
+                            self.textbar.remove_letter()
+                            
                         
 
 
