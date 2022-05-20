@@ -2,7 +2,6 @@ import cv2
 import mediapipe as mp
 import math
 from Handbox import Handbox
-from Key import Key
 from Keyboard import KeyBoard
 from TextBar import TextBar
 
@@ -10,7 +9,7 @@ def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
     return distance
 
-def detect_click(Landmarks, Threshold = 25, mode = 1):
+def detect_click(Landmarks,mode = 1,Threshold = 25):
 
     if Landmarks:
         if mode == 0: # Using Index fingertip and middle fingertip
@@ -31,14 +30,41 @@ def detect_click(Landmarks, Threshold = 25, mode = 1):
 
         index_X = Landmarks[static_finger_ID][1] 
         index_Y = Landmarks[static_finger_ID][2] 
-        middle_X = Landmarks[aux_finger_ID][1] 
-        middle_Y = Landmarks[aux_finger_ID][2] 
-        distance = get_distance(index_X,index_Y,middle_X,middle_Y)
+        aux_X = Landmarks[aux_finger_ID][1] 
+        aux_Y = Landmarks[aux_finger_ID][2] 
+        distance = get_distance(index_X,index_Y,aux_X,aux_Y)
         if distance < Threshold:
             return True
         else:
             return False
     
+
+def draw_cursor(img,mode,Landmarks):
+    if Landmarks:
+            if mode == 0: # Using Index fingertip and middle fingertip
+                static_finger_ID = 8
+                # aux_finger_ID = 12 
+            
+            if mode == 1: # Using thumb fingertip and base of index finger
+                static_finger_ID = 8
+                # aux_finger_ID = 4 
+
+            if mode == 2:
+                static_finger_ID = 8 # Using middle fingertip and thumb
+                # aux_finger_ID = 4 
+
+            if mode == 3:
+                static_finger_ID = 8 # Using middle fingertip and thumb
+                # aux_finger_ID = 4 
+
+            index_X = Landmarks[static_finger_ID][1] 
+            index_Y = Landmarks[static_finger_ID][2] 
+            # aux_X = Landmarks[aux_finger_ID][1] 
+            # aux_Y = Landmarks[aux_finger_ID][2] 
+
+            cv2.circle(img,(index_X,index_Y),5,(0,255,0),-1)
+            # cv2.circle(img,(aux_X,aux_Y)    ,5,(0,255,0),-1)
+        
 
 class Main():
     
@@ -52,12 +78,19 @@ class Main():
                 if x < x_click < x + width:
                     if y < y_click < y + height:
                         key.is_pressed = True
-                        if key.type == 'text':
+                        if key.type == 'text': 
                             self.textbar.add_letter(key.text)
-                        
+                                              
                         if key.type == 'backspace':
-
                             self.textbar.remove_letter()
+                               
+                        if key.type == 'spacebar':
+                            self.textbar.add_space()
+                              
+                        if key.type == 'eraser':
+                            self.textbar.erase_all()
+                               
+                        
                             
                         
 
@@ -74,11 +107,16 @@ class Main():
 
         self.textbar = TextBar()
 
+        self.click_mode = 1
+
         self.main()
+
+    
 
 
     def main(self):
 
+        
         while True:
             sucess, img = self.cap.read()
             if sucess:
@@ -96,15 +134,17 @@ class Main():
                 # Draw Hand Landmarks
                 if(results.multi_hand_landmarks):
                     for handLms in results.multi_hand_landmarks:
-                        self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
+                        # self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
                         pass
                     
-
+                    
 
                     for id, landmark in enumerate(handLms.landmark):
                         px, py = int(landmark.x * w), int(landmark.y * h)
                         self.Landmarks.append((id,px,py))
 
+                    
+                    
 
 
 
@@ -113,16 +153,15 @@ class Main():
                 self.kb = KeyBoard((50,50),img,40)
 
 
+                draw_cursor(img,self.click_mode,self.Landmarks)
 
-                if detect_click(self.Landmarks):
+
+
+
+                if detect_click(self.Landmarks,1):
                     click_pos = (self.Landmarks[8][1],self.Landmarks[8][2])
-                    # print("Click on pos:", click_pos)
-                    self.click_key(click_pos)
-                    
-
-
-                
-                self.kb.update_colors()
+                    self.click_key(click_pos)              
+                    self.kb.update_colors()
 
 
                 
@@ -137,14 +176,6 @@ class Main():
                     cv2.destroyAllWindows()
                     break
                 
-
-
-                    
-
-
-
-                    
-
             else:
                 print("Can't get video frame, retrying...")
                 self.cap.release()

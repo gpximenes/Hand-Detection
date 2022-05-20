@@ -1,4 +1,5 @@
-from Key import BackSpace, Key
+from pyexpat import ErrorString
+from Key import BackSpace, Eraser, Key, SpaceBar
 
 class KeyBoard():
     def __init__(self, ini_pos ,img,key_size,space=20 ) -> None:
@@ -43,10 +44,6 @@ class KeyBoard():
             for j in range(self.columns):    
                 positions.append((xpos + self.space * j, ypos))
             ypos = ypos + self.space
-
-        
-
-       
         return positions
 
 
@@ -56,17 +53,29 @@ class KeyBoard():
 
     
     def draw_keys(self,key_pos):
+        # Draw Text Keys
         for i,pos in (enumerate(key_pos)):
             if i >= len(self.key_texts):
                 break
             x,y = pos
             self.keys.append(Key(self.key_texts[i],x,y))
 
+        # Draw BackSpace Key
         ini_xpos, ini_ypos = key_pos[0]
+        backspace_pos = (ini_xpos + self.space * self.columns ,ini_ypos)
+        self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1],50,50))
 
-        backspace_pos = (ini_xpos + self.space * (self.columns + 1) ,ini_ypos)
-        self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1]))
+        # Draw SpaceBar
+
+        spaceBar_pos = (ini_xpos, ini_ypos  + self.space * self.rows)
+        self.keys.append(SpaceBar(spaceBar_pos[0],spaceBar_pos[1], self.columns * self.space))
         
+        # Draw Eraser 
+
+        eraser_pos = (ini_xpos + self.space * self.columns ,ini_ypos + self.space * self.rows)
+        self.keys.append(Eraser(eraser_pos[0],eraser_pos[1]))
+
+
         for key in self.keys:
             key.draw_key(self.img) 
         
@@ -77,10 +86,4 @@ class KeyBoard():
         for key in self.keys:
             key.draw_key(self.img) 
 
-    def draw_backSpace(self):
-        ini_xpos,ini_ypos = self.ini_pos
-        backspace_pos = (ini_xpos + self.space * (self.columns + 1) ,ini_ypos)
-        x,y = backspace_pos
-        self.backSpace = BackSpace(x,y)
-        self.keys.append(self.backSpace)
         
