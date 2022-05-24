@@ -4,6 +4,7 @@ import math
 from Handbox import Handbox
 from Keyboard import KeyBoard
 from TextBar import TextBar
+from time import perf_counter
 
 def get_distance(x1,y1,x2,y2):
     distance = math.hypot(x2 - x1, y2 - y1)
@@ -63,12 +64,24 @@ def draw_cursor(img,mode,Landmarks):
             # aux_Y = Landmarks[aux_finger_ID][2] 
 
             cv2.circle(img,(index_X,index_Y),5,(0,255,0),-1)
-            # cv2.circle(img,(aux_X,aux_Y)    ,5,(0,255,0),-1)
         
 
 class Main():
     
+    def change_keyboard_mode(self):
+        timeout = 0.2
+
+        deltaTime = perf_counter() - self.last_mode_change
+        if deltaTime > timeout:
+            if self.keyboard_mode == 1:
+                self.keyboard_mode = 2
+            elif self.keyboard_mode == 2:
+                self.keyboard_mode = 1
+            self.last_mode_change = perf_counter()
+
+
     def click_key(self,click_pos):
+
         x_click, y_click = click_pos
         if self.Landmarks:
             for key in self.kb.keys:
@@ -79,16 +92,17 @@ class Main():
                     if y < y_click < y + height:
                         key.is_pressed = True
                         if key.type == 'text': 
-                            self.textbar.add_letter(key.text)
-                                              
+                            self.textbar.add_letter(key.text)                                             
                         if key.type == 'backspace':
-                            self.textbar.remove_letter()
-                               
+                            self.textbar.remove_letter()                           
                         if key.type == 'spacebar':
-                            self.textbar.add_space()
-                              
+                            self.textbar.add_space()                              
                         if key.type == 'eraser':
                             self.textbar.erase_all()
+                        if key.type == 'mode':
+                            self.change_keyboard_mode()
+
+
                                
                         
                             
@@ -108,6 +122,11 @@ class Main():
         self.textbar = TextBar()
 
         self.click_mode = 1
+
+        self.keyboard_mode = 2
+        self.last_mode_change = 1
+
+
 
         self.main()
 
@@ -150,7 +169,7 @@ class Main():
 
                 # self.box.draw(self.Landmarks,img)
 
-                self.kb = KeyBoard((50,50),img,40)
+                self.kb = KeyBoard((60,60),img,40,self.keyboard_mode)
 
 
                 draw_cursor(img,self.click_mode,self.Landmarks)
@@ -166,9 +185,6 @@ class Main():
 
                 
                 cv2.imshow("Cap", img)
-
-                if cv2.waitKey(5) & 0xFF==ord('t') :
-                    print(*self.textbar.text, sep="")
 
 
                 if cv2.waitKey(5) & 0xFF==ord('s') :

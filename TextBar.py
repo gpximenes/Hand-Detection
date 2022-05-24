@@ -1,4 +1,3 @@
-
 import os
 from time import perf_counter
 
@@ -14,6 +13,9 @@ class TextBar():
 
         self.timeout = 0.5
         os.system('cls')
+
+
+
 
 
     def add_letter(self,letter):
