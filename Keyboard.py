@@ -1,10 +1,12 @@
 from Key import BackSpace, Eraser, Key, Mode_key, SpaceBar
+from time import perf_counter
 
 class KeyBoard():
-    def __init__(self, ini_pos ,img,key_size,mode,space=20 ) -> None:
-        self.img = img
+    def __init__(self, ini_pos ,key_size,mode,space=20 ) -> None:
         self.space = space + key_size
+
         self.mode = mode
+        self.last_mode_change = 0
 
         self.key_texts = ['A','B','C','D','E','F','G','H','I','J',
                         'K','L','M','N','O','P','Q','R','S','T',
@@ -24,19 +26,17 @@ class KeyBoard():
 
         
 
-        self.draw_keyboard(self.mode)
 
 
-
-    def draw_keyboard(self, mode):
+    def draw_keyboard(self, mode,img):
         if mode == 1:
             positions = self.generate_keys_pos(self.ini_pos, self.rows_text,self.columns_text)
-            self.update_keys_pos(positions)
-            self.draw_keys(self.key_pos, mode)
+            self.key_pos = positions
+            self.draw_keys(self.key_pos, mode,img)
         if mode == 2:
             positions = self.generate_keys_pos(self.ini_pos, self.rows_nums,self.columns_nums)
-            self.update_keys_pos(positions)
-            self.draw_keys(self.key_pos, mode)
+            self.key_pos = positions
+            self.draw_keys(self.key_pos, mode,img)
         
 
 
@@ -52,22 +52,31 @@ class KeyBoard():
 
 
 
-    def update_keys_pos(self,positions):
-
-        self.key_pos = positions
-
-
-    def update_colors(self):
+    def update_colors(self,img):
         for key in self.keys:
-            key.draw_key(self.img) 
+            key.draw_key(img) 
+
+    def change_keyboard_mode(self):
+        timeout = 0.4
+
+        deltaTime = perf_counter() - self.last_mode_change
+        if deltaTime > timeout:
+            if self.mode == 1:
+                self.mode = 2
+            elif self.mode == 2:
+                self.mode = 1
+            self.last_mode_change = perf_counter()
+            
 
     
-    def draw_keys(self,key_pos, mode):
+    def draw_keys(self,keys_pos, mode, img):
+        self.keys = []
+
         if mode == 1 :
             texts = self.key_texts
 
             # Draw Keys
-            for i,pos in (enumerate(key_pos)):
+            for i,pos in (enumerate(keys_pos)):
                 if i >= len(texts):
                     break
                 x,y = pos
@@ -75,7 +84,7 @@ class KeyBoard():
 
 
             # Draw BackSpace Key
-            ini_xpos, ini_ypos = key_pos[0]
+            ini_xpos, ini_ypos = keys_pos[0]
             backspace_pos = (ini_xpos + self.space * self.columns_text ,ini_ypos)
             self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1],50,50))
 
@@ -100,14 +109,14 @@ class KeyBoard():
 
             texts = self.key_nums
             # Draw Keys
-            for i,pos in (enumerate(key_pos)):
+            for i,pos in (enumerate(keys_pos)):
                 if i >= len(texts):
                     break
                 x,y = pos
                 self.keys.append(Key(texts[i],x,y))
 
             # Draw BackSpace Key
-            ini_xpos, ini_ypos = key_pos[0]
+            ini_xpos, ini_ypos = keys_pos[0]
             backspace_pos = (ini_xpos + self.space * self.columns_nums ,ini_ypos)
             self.keys.append(BackSpace(backspace_pos[0],backspace_pos[1],50,50))
 
@@ -128,7 +137,7 @@ class KeyBoard():
 
 
         for key in self.keys:
-            key.draw_key(self.img) 
+            key.draw_key(img) 
         
 
 

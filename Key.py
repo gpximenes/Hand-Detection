@@ -122,7 +122,7 @@ class Eraser():
 
 
 class Mode_key():
-    def __init__(self, x, y, width=50, height=50):
+    def __init__(self, x, y, width=60, height=60):
 
         self.type = 'mode'
 

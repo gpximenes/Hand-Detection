@@ -6,78 +6,66 @@ from Keyboard import KeyBoard
 from TextBar import TextBar
 from time import perf_counter
 
-def get_distance(x1,y1,x2,y2):
-    distance = math.hypot(x2 - x1, y2 - y1)
-    return distance
-
-def detect_click(Landmarks,mode = 1,Threshold = 25):
-
-    if Landmarks:
-        if mode == 0: # Using Index fingertip and middle fingertip
-            static_finger_ID = 8
-            aux_finger_ID = 12 
+class Main():
         
-        if mode == 1: # Using thumb fingertip and base of index finger
-            static_finger_ID = 6
-            aux_finger_ID = 4 
+    def get_distance(self, x1,y1,x2,y2):
+        distance = math.hypot(x2 - x1, y2 - y1)
+        return distance
 
-        if mode == 2:
-            static_finger_ID = 12 # Using middle fingertip and thumb
-            aux_finger_ID = 4 
+    def detect_click(self,Landmarks,mode = 1,Threshold = 25):
 
-        if mode == 3:
-            static_finger_ID = 8 # Using middle fingertip and thumb
-            aux_finger_ID = 4 
-
-        index_X = Landmarks[static_finger_ID][1] 
-        index_Y = Landmarks[static_finger_ID][2] 
-        aux_X = Landmarks[aux_finger_ID][1] 
-        aux_Y = Landmarks[aux_finger_ID][2] 
-        distance = get_distance(index_X,index_Y,aux_X,aux_Y)
-        if distance < Threshold:
-            return True
-        else:
-            return False
-    
-
-def draw_cursor(img,mode,Landmarks):
-    if Landmarks:
+        if Landmarks:
             if mode == 0: # Using Index fingertip and middle fingertip
                 static_finger_ID = 8
-                # aux_finger_ID = 12 
+                aux_finger_ID = 12 
             
             if mode == 1: # Using thumb fingertip and base of index finger
-                static_finger_ID = 8
-                # aux_finger_ID = 4 
+                static_finger_ID = 6
+                aux_finger_ID = 4 
 
             if mode == 2:
-                static_finger_ID = 8 # Using middle fingertip and thumb
-                # aux_finger_ID = 4 
+                static_finger_ID = 12 # Using middle fingertip and thumb
+                aux_finger_ID = 4 
 
             if mode == 3:
                 static_finger_ID = 8 # Using middle fingertip and thumb
-                # aux_finger_ID = 4 
+                aux_finger_ID = 4 
 
             index_X = Landmarks[static_finger_ID][1] 
             index_Y = Landmarks[static_finger_ID][2] 
-            # aux_X = Landmarks[aux_finger_ID][1] 
-            # aux_Y = Landmarks[aux_finger_ID][2] 
-
-            cv2.circle(img,(index_X,index_Y),5,(0,255,0),-1)
+            aux_X = Landmarks[aux_finger_ID][1] 
+            aux_Y = Landmarks[aux_finger_ID][2] 
+            distance = self.get_distance(index_X,index_Y,aux_X,aux_Y)
+            if distance < Threshold:
+                return True
+            else:
+                return False
         
 
-class Main():
-    
-    def change_keyboard_mode(self):
-        timeout = 0.2
+    def draw_cursor(self, img ,mode, Landmarks):
+        if Landmarks:
+                if mode == 0: # Using Index fingertip and middle fingertip
+                    static_finger_ID = 8
+                    # aux_finger_ID = 12 
+                
+                if mode == 1: # Using thumb fingertip and base of index finger
+                    static_finger_ID = 8
+                    # aux_finger_ID = 4 
 
-        deltaTime = perf_counter() - self.last_mode_change
-        if deltaTime > timeout:
-            if self.keyboard_mode == 1:
-                self.keyboard_mode = 2
-            elif self.keyboard_mode == 2:
-                self.keyboard_mode = 1
-            self.last_mode_change = perf_counter()
+                if mode == 2:
+                    static_finger_ID = 8 # Using middle fingertip and thumb
+                    # aux_finger_ID = 4 
+
+                if mode == 3:
+                    static_finger_ID = 8 # Using middle fingertip and thumb
+                    # aux_finger_ID = 4 
+
+                index_X = Landmarks[static_finger_ID][1] 
+                index_Y = Landmarks[static_finger_ID][2] 
+                # aux_X = Landmarks[aux_finger_ID][1] 
+                # aux_Y = Landmarks[aux_finger_ID][2] 
+
+                cv2.circle(img,(index_X,index_Y),5,(0,255,0),-1)
 
 
     def click_key(self,click_pos):
@@ -100,7 +88,7 @@ class Main():
                         if key.type == 'eraser':
                             self.textbar.erase_all()
                         if key.type == 'mode':
-                            self.change_keyboard_mode()
+                            self.kb.change_keyboard_mode()
 
 
                                
@@ -123,7 +111,7 @@ class Main():
 
         self.click_mode = 1
 
-        self.keyboard_mode = 2
+        self.keyboard_mode = 1
         self.last_mode_change = 1
 
 
@@ -135,7 +123,8 @@ class Main():
 
     def main(self):
 
-        
+        self.kb = KeyBoard((60,60),40,self.keyboard_mode)
+
         while True:
             sucess, img = self.cap.read()
             if sucess:
@@ -143,14 +132,13 @@ class Main():
                 h, w, _ = img.shape
                 
                 imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = self.hands.process(imgRGB)
 
-
-                self.Landmarks = []
-
+                self.kb.draw_keyboard( self.kb.mode ,img)
 
 
                 # Draw Hand Landmarks
+                results = self.hands.process(imgRGB)
+                self.Landmarks = []
                 if(results.multi_hand_landmarks):
                     for handLms in results.multi_hand_landmarks:
                         # self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
@@ -162,25 +150,15 @@ class Main():
                         px, py = int(landmark.x * w), int(landmark.y * h)
                         self.Landmarks.append((id,px,py))
 
+                    self.draw_cursor(img, self.click_mode, self.Landmarks)
                     
                     
 
 
-
-                # self.box.draw(self.Landmarks,img)
-
-                self.kb = KeyBoard((60,60),img,40,self.keyboard_mode)
-
-
-                draw_cursor(img,self.click_mode,self.Landmarks)
-
-
-
-
-                if detect_click(self.Landmarks,1):
+                if self.detect_click(self.Landmarks,1):
                     click_pos = (self.Landmarks[8][1],self.Landmarks[8][2])
                     self.click_key(click_pos)              
-                    self.kb.update_colors()
+                    self.kb.update_colors(img)
 
 
                 
