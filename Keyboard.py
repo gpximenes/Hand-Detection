@@ -10,12 +10,12 @@ class KeyBoard():
 
         self.key_texts = ['A','B','C','D','E','F','G','H','I','J',
                         'K','L','M','N','O','P','Q','R','S','T',
-                             'U','V','W','X','Y','Z']
+                             'U','V','W','X','Y','Z',",",".",'?','!',':','@']
 
         self.rows_text,self.columns_text = (4,8)
 
 
-        self.key_nums = ['1','2','3','4','5','6','7','8','9','0']
+        self.key_nums = ['1','2','3','4','5','6','7','8','9','0','-','+']
 
         self.rows_nums,self.columns_nums = (4,3)
 

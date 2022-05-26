@@ -15,9 +15,6 @@ class TextBar():
         os.system('cls')
 
 
-
-
-
     def add_letter(self,letter):
         if not self.text:
             self.text.append(letter)

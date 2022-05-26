@@ -42,28 +42,11 @@ class Main():
                 return False
         
 
-    def draw_cursor(self, img ,mode, Landmarks):
+    def draw_cursor(self, img , Landmarks):
         if Landmarks:
-                if mode == 0: # Using Index fingertip and middle fingertip
-                    static_finger_ID = 8
-                    # aux_finger_ID = 12 
-                
-                if mode == 1: # Using thumb fingertip and base of index finger
-                    static_finger_ID = 8
-                    # aux_finger_ID = 4 
-
-                if mode == 2:
-                    static_finger_ID = 8 # Using middle fingertip and thumb
-                    # aux_finger_ID = 4 
-
-                if mode == 3:
-                    static_finger_ID = 8 # Using middle fingertip and thumb
-                    # aux_finger_ID = 4 
-
-                index_X = Landmarks[static_finger_ID][1] 
-                index_Y = Landmarks[static_finger_ID][2] 
-                # aux_X = Landmarks[aux_finger_ID][1] 
-                # aux_Y = Landmarks[aux_finger_ID][2] 
+                cursor_finger_ID = 8
+                index_X = Landmarks[cursor_finger_ID][1] 
+                index_Y = Landmarks[cursor_finger_ID][2] 
 
                 cv2.circle(img,(index_X,index_Y),5,(0,255,0),-1)
 
@@ -105,6 +88,8 @@ class Main():
         self.hands = self.mpHands.Hands()
         self.mpDraw = mp.solutions.drawing_utils
 
+
+    
         # self.box = Handbox()
 
         self.textbar = TextBar()
@@ -149,12 +134,9 @@ class Main():
                     for id, landmark in enumerate(handLms.landmark):
                         px, py = int(landmark.x * w), int(landmark.y * h)
                         self.Landmarks.append((id,px,py))
-
-                    self.draw_cursor(img, self.click_mode, self.Landmarks)
+                    self.draw_cursor(img, self.Landmarks)
                     
                     
-
-
                 if self.detect_click(self.Landmarks,1):
                     click_pos = (self.Landmarks[8][1],self.Landmarks[8][2])
                     self.click_key(click_pos)              
@@ -174,8 +156,6 @@ class Main():
                 print("Can't get video frame, retrying...")
                 self.cap.release()
                 cv2.destroyAllWindows()
-
-
 
 
 
