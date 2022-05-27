@@ -150,3 +150,34 @@ class Mode_key():
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
 
+
+
+class CapsLock():
+    def __init__(self, x, y, width=70, height=50):
+
+        self.type = 'capslock'
+
+        self.width = width
+        self.height = height
+        
+        self.x = x
+        self.y = y
+        
+        self.text = 'CpLk'
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.font_size = 0.75
+
+        self.is_pressed = False
+        self.color = (0, 0, 255) # Red
+        self.pressed_color = (0,255,0) # Green
+        self.text_color = (0,0,0)
+
+    def draw_key(self,img):
+
+        if not self.is_pressed:
+            cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.color, cv2.FILLED)
+            cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
+        if self.is_pressed:
+            cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
+            cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
+

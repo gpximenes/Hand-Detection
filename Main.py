@@ -72,6 +72,8 @@ class Main():
                             self.textbar.erase_all()
                         if key.type == 'mode':
                             self.kb.change_keyboard_mode()
+                        if key.type == 'capslock':
+                            self.kb.change_capitalization()
 
 
                                
@@ -89,7 +91,7 @@ class Main():
         self.mpDraw = mp.solutions.drawing_utils
 
 
-    
+
         # self.box = Handbox()
 
         self.textbar = TextBar()

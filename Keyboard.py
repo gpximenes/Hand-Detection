@@ -1,4 +1,4 @@
-from Key import BackSpace, Eraser, Key, Mode_key, SpaceBar
+from Key import BackSpace, Eraser, Key, Mode_key, CapsLock, SpaceBar
 from time import perf_counter
 
 class KeyBoard():
@@ -11,6 +11,9 @@ class KeyBoard():
         self.key_texts = ['A','B','C','D','E','F','G','H','I','J',
                         'K','L','M','N','O','P','Q','R','S','T',
                              'U','V','W','X','Y','Z',",",".",'?','!',':','@']
+
+        self.caps = True
+        self.last_caps_change = 0
 
         self.rows_text,self.columns_text = (4,8)
 
@@ -66,6 +69,34 @@ class KeyBoard():
             elif self.mode == 2:
                 self.mode = 1
             self.last_mode_change = perf_counter()
+
+    def change_capitalization(self):
+        timeout = 0.4
+
+        deltaTime = perf_counter() - self.last_caps_change
+        if deltaTime > timeout:
+            if self.caps:
+                for id,key in (enumerate(self.key_texts)):
+                    try:
+                        key = key.lower()
+                        self.key_texts[id] = key
+                    except:
+                        pass
+                    self.caps = False
+                self.last_caps_change = perf_counter()
+                return
+            if not self.caps:
+                for id,key in (enumerate(self.key_texts)):
+                    try:
+                        key = key.upper()
+                        self.key_texts[id] = key
+                    except:
+                        pass
+                    self.caps = True
+                self.last_caps_change = perf_counter()
+                return
+                                
+
             
 
     
@@ -103,6 +134,11 @@ class KeyBoard():
             mode_key_pos = (ini_xpos, ini_ypos - self.space)
             self.keys.append(Mode_key(mode_key_pos[0],mode_key_pos[1]))
 
+            # Draw CapsLock Key
+
+            shit_key_pos = (backspace_pos[0], backspace_pos[1] + self.space)
+            self.keys.append(CapsLock(shit_key_pos[0],shit_key_pos[1]))
+
 
 
         if mode == 2 :
@@ -134,6 +170,7 @@ class KeyBoard():
 
             mode_key_pos = (ini_xpos, ini_ypos - self.space)
             self.keys.append(Mode_key(mode_key_pos[0],mode_key_pos[1]))
+
 
 
         for key in self.keys:
