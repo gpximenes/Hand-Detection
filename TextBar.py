@@ -19,43 +19,33 @@ class TextBar():
         if not self.text:
             self.text.append(letter)
             print(*self.text,sep='')
-            self.time_last_click = perf_counter()
             return 
 
         if self.text[- 1] != letter:
             self.text.append(letter)
             os.system('cls')
             print(*self.text,sep='')
-            self.time_last_click = perf_counter()
             return 
 
-        deltaTime = perf_counter() - self.time_last_click 
-        if self.text[-1] == letter and deltaTime >  self.timeout:
+        if self.text[-1] == letter:
             self.text.append(letter)
-            self.time_last_click = perf_counter()
             os.system('cls')
             print(*self.text,sep='')
         else:
             return 
 
     def remove_letter(self):
-        try:
-            deltaTime = perf_counter() - self.time_last_click 
-            if deltaTime >  self.timeout:
+        try: 
                 self.text.pop()
                 os.system('cls')
                 print(*self.text,sep='')
-                self.time_last_click = perf_counter()
         except:
             pass
 
     def add_space(self):
-        deltaTime = perf_counter() - self.time_last_click 
-        if deltaTime >  self.timeout:
             self.text.append(" ")
             os.system('cls')
             print(*self.text,sep='')
-            self.time_last_click = perf_counter()
 
 
     def erase_all(self):

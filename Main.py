@@ -8,6 +8,42 @@ from time import perf_counter
 
 class Main():
         
+
+
+
+    def __init__(self) -> None:
+        self.cap = cv2.VideoCapture(0)
+
+
+        self.mpHands = mp.solutions.hands
+        self.hands = self.mpHands.Hands()
+        self.mpDraw = mp.solutions.drawing_utils
+
+
+
+        # self.box = Handbox()
+
+        self.textbar = TextBar()
+
+        self.click_mode = 1
+
+        self.keyboard_mode = 1
+        self.last_mode_change = 1
+
+        self.time_last_click = 0
+        self.click_timeout = 0.6
+
+        self.main()
+
+    
+    def auth_click(self):
+        time_click = perf_counter()
+        delta_time = time_click - self.time_last_click
+        if delta_time > self.click_timeout:
+            return True
+        else:
+            return False
+
     def get_distance(self, x1,y1,x2,y2):
         distance = math.hypot(x2 - x1, y2 - y1)
         return distance
@@ -61,52 +97,25 @@ class Main():
 
                 if x < x_click < x + width:
                     if y < y_click < y + height:
-                        key.is_pressed = True
-                        if key.type == 'text': 
-                            self.textbar.add_letter(key.text)                                             
-                        if key.type == 'backspace':
-                            self.textbar.remove_letter()                           
-                        if key.type == 'spacebar':
-                            self.textbar.add_space()                              
-                        if key.type == 'eraser':
-                            self.textbar.erase_all()
-                        if key.type == 'mode':
-                            self.kb.change_keyboard_mode()
-                        if key.type == 'capslock':
-                            self.kb.change_capitalization()
-
-
-                               
-                        
-                            
-                        
-
-
-    def __init__(self) -> None:
-        self.cap = cv2.VideoCapture(0)
-
-
-        self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands()
-        self.mpDraw = mp.solutions.drawing_utils
-
-
-
-        # self.box = Handbox()
-
-        self.textbar = TextBar()
-
-        self.click_mode = 1
-
-        self.keyboard_mode = 1
-        self.last_mode_change = 1
-
-
-
-        self.main()
-
-    
-
+                        if self.auth_click():
+                            self.time_last_click = perf_counter()
+                            key.is_pressed = True
+                            try:
+                                key.press_key()
+                            except:
+                                pass
+                            if key.type == 'text': 
+                                self.textbar.add_letter(key.text)                                             
+                            if key.type == 'backspace':
+                                self.textbar.remove_letter()                           
+                            if key.type == 'spacebar':
+                                self.textbar.add_space()                              
+                            if key.type == 'eraser':
+                                self.textbar.erase_all()
+                            if key.type == 'mode':
+                                self.kb.change_keyboard_mode()
+                            if key.type == 'capslock':
+                                self.kb.change_capitalization()
 
     def main(self):
 

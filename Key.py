@@ -1,4 +1,5 @@
 import cv2 
+import pyautogui
 
 
 class Key():
@@ -28,6 +29,11 @@ class Key():
         if self.is_pressed:
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, (255,255,255), 2)
+
+
+    def press_key(self):
+        pyautogui.press(self.text)
+
           
 
 class BackSpace():
@@ -59,6 +65,8 @@ class BackSpace():
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
 
+    def press_key(self):
+        pyautogui.press('backspace')
  
 class SpaceBar():
     def __init__(self, x, y, width=200, height=50):
@@ -89,6 +97,9 @@ class SpaceBar():
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
 
+    def press_key(self):
+        pyautogui.press('space')
+ 
 
 
 class Eraser():
@@ -119,7 +130,8 @@ class Eraser():
         if self.is_pressed:
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
             cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
-
+    def press_key(self):
+        pyautogui.hotkey('ctrl','a','delete')
 
 class Mode_key():
     def __init__(self, x, y, width=60, height=60):
