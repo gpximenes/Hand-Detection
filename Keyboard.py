@@ -1,4 +1,4 @@
-from Key import BackSpace, Eraser, Key, Mode_key, CapsLock, SpaceBar
+from Key import BackSpace, Enter, Eraser, Key, Mode_key, CapsLock, SpaceBar
 from time import perf_counter
 
 class KeyBoard():
@@ -131,14 +131,18 @@ class KeyBoard():
 
             # Draw Mode Key
 
-            mode_key_pos = (ini_xpos, ini_ypos - self.space)
+            mode_key_pos = (ini_xpos, ini_ypos - self.space - 5)
             self.keys.append(Mode_key(mode_key_pos[0],mode_key_pos[1]))
 
             # Draw CapsLock Key
 
-            shit_key_pos = (backspace_pos[0], backspace_pos[1] + self.space)
-            self.keys.append(CapsLock(shit_key_pos[0],shit_key_pos[1]))
+            caps_key_pos = (backspace_pos[0], backspace_pos[1] + self.space)
+            self.keys.append(CapsLock(caps_key_pos[0],caps_key_pos[1]))
 
+            # Draw Enter Key
+
+            enter_key_pos = (caps_key_pos[0], caps_key_pos[1] + self.space)
+            self.keys.append(Enter(enter_key_pos[0],enter_key_pos[1]))
 
 
         if mode == 2 :

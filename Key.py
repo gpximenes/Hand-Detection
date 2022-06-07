@@ -37,7 +37,7 @@ class Key():
           
 
 class BackSpace():
-    def __init__(self, x, y, width=50, height=50):
+    def __init__(self, x, y, width=60, height=50):
 
         self.type = 'backspace'
 
@@ -67,7 +67,42 @@ class BackSpace():
 
     def press_key(self):
         pyautogui.press('backspace')
+
+
+
+class Enter():
+    def __init__(self, x, y, width=70, height=110):
+
+        self.type = 'enter'
+
+        self.width = width
+        self.height = height
+        
+        self.x = x
+        self.y = y
+        
+        self.text = 'Enter'
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.font_size = 0.8
+        self.text_color = (255,255,255)
+
+        self.is_pressed = False
+        self.color = (255, 51, 51) # Blue
+        self.pressed_color = (0,0,255) # Red
+
+    def draw_key(self,img):
+
+        if not self.is_pressed:
+            cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.color, cv2.FILLED)
+            cv2.putText(img,self.text, ( self.x + 5 , self.y + int(self.height / 2) ), self.font , self.font_size, self.text_color, 2)
+        if self.is_pressed:
+            cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
+            cv2.putText(img,self.text, ( self.x + 5 , self.y + int(self.height / 2) ), self.font , self.font_size, self.text_color, 2)
  
+    def press_key(self):
+        pyautogui.press('enter')
+ 
+
 class SpaceBar():
     def __init__(self, x, y, width=200, height=50):
 
@@ -157,10 +192,10 @@ class Mode_key():
 
         if not self.is_pressed:
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.color, cv2.FILLED)
-            cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
+            cv2.putText(img,self.text, ( self.x + 2 ,  self.y + self.height - 10  ), self.font , self.font_size, self.text_color, 2)
         if self.is_pressed:
             cv2.rectangle(img, (self.x,self.y),(self.x + self.width,self.y + self.height), self.pressed_color, cv2.FILLED)
-            cv2.putText(img,self.text, ( self.x + 5 , self.y + self.height - 5 ), self.font , self.font_size, self.text_color, 2)
+            cv2.putText(img,self.text, ( self.x + 2 ,  self.y + self.height - 10 ), self.font , self.font_size, self.text_color, 2)
 
 
 

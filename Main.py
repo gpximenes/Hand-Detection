@@ -35,7 +35,6 @@ class Main():
 
         self.main()
 
-    
     def auth_click(self):
         time_click = perf_counter()
         delta_time = time_click - self.time_last_click
@@ -116,10 +115,15 @@ class Main():
                                 self.kb.change_keyboard_mode()
                             if key.type == 'capslock':
                                 self.kb.change_capitalization()
+                            if key.type == 'enter':
+                                self.textbar.add_letter("\n")
 
     def main(self):
 
         self.kb = KeyBoard((60,60),40,self.keyboard_mode)
+
+        # black_img = cv2.imread("black.jpg")
+        # black_img = black_img[0:480,0:640]
 
         while True:
             sucess, img = self.cap.read()
@@ -155,10 +159,10 @@ class Main():
 
 
                 
-                cv2.imshow("Cap", img)
+                cv2.imshow("Virtual Keyboard", img)
 
 
-                if cv2.waitKey(5) & 0xFF==ord('s') :
+                if cv2.waitKey(5) & 0xFF==27: # Esc to exit
                     self.cap.release()
                     cv2.destroyAllWindows()
                     break
